@@ -4,36 +4,47 @@
 \label{sec:intro}
 
 The past few years have witnessed a vast body of machine learning (ML) techniques for 
-the automatic segmentation of medical images. Decision forests~\cite{zikic2012decision,tustison2013ants},
+the automatic segmentation of medical images. Decision forests (DFs)~\cite{zikic2012decision,tustison2013ants},
 and more recently, deep neural networks~\cite{pereira2015deep} have yielded state-of-the-art results at 
 MICCAI BRATS (\uline{Bra}in \uline{T}umour \uline{S}egmentation) challenges. 
-Our approach builds upon the framework of DFs, investigating efficient and generic ways to increase their accuracy and generalisation. %We discuss our contributions in the context of the MICCAI 2016 BRATS challenge, where the proposed approach compared favorably with the state-of-the-art, despite using generic features and a fraction of their computational resources. 
 
+In this paper, we describe our approach that builds upon the framework of DFs---one that departs from the usual 
+hand-crafting of powerful features~\cite{cite-examples}, and is a complementary scheme that is entirely generic and 
+free of additional computations.  
+%investigating efficient and generic 
+%ways to increase their accuracy and generalisation. %We discuss our contributions in the context of the MICCAI 2016 BRATS challenge, where the proposed approach compared favorably with the state-of-the-art, despite using generic features and a fraction of their computational resources. 
 %They have been used with success for the localisation and segmentation of multiple organs~\cite{Lempitsky:2009,pauly2011fast,cuingnet2012automatic} and of anomalies~\cite{geremia2011spatial,zikic2012decision,tustison2013ants} in medical volumes. % NOTE: should we cover other medical imaging applications of the framework?
- 
-
-Decision trees partition the feature space via a sequence of \textit{learnt} 
-binary decisions (giving rise to a binary tree structure) into a collection of disjoint subsets (at tree leaves). 
-Learnt decisions favour `pure' tree leaves, \eg the majority of test points routed to a given leaf should share the 
-same label. In the DF framework, the predictions of a collection of \textit{randomised} decision trees are aggregated. 
-Randomisation occurs at training time: tree node decisions are weakly discriminative learners chosen among random 
-subsets of candidate decisions~\cite{amit1997shape,ho1998random} evaluated on random subsets of training data~\cite{breiman2001random}. In principle, the mechanism increases the discriminative power and generalisation of the algorithm. Indeed, fast generic intensity-based weak learners chained within \textit{deep} tree architectures (millions of nodes or more) have 
+%Decision trees partition the feature space via a sequence of \textit{learnt} 
+%binary decisions (giving rise to a binary tree structure) into a collection of disjoint subsets (at tree leaves). 
+%Learnt decisions favour `pure' tree leaves, \eg the majority of test points routed to a given leaf should share the 
+%same label. In the DF framework, the predictions of a collection of \textit{randomised} decision trees are aggregated. 
+%Randomisation occurs at training time: tree node decisions are weakly discriminative learners chosen among random 
+%subsets of candidate decisions~\cite{amit1997shape,ho1998random} evaluated on random subsets of training data~\cite{breiman2001random}. In principle, the mechanism increases the discriminative power and generalisation of the algorithm. Indeed, fast generic intensity-based weak learners chained within \textit{deep} tree architectures (millions of nodes or more) have 
 %AVN: I think this is fine for now, keeping TMI in mind. For ICML we need to give other examples as well.
-convincingly demonstrated their performance, see \eg \cite{criminisi2013decision}. 
+%convincingly demonstrated their performance, see \eg \cite{criminisi2013decision}. 
+%Still in practice, more expressive features yield more
+%discriminative node decisions, and therefore %crafting such features has been the primary means to improve the segmentation accuracy of DFs
+%improved segmentation accuracy. Tustison et al.~\cite{tustison2013ants,tustison2015optimal} incorporate features derived from the local intensity context and texture, from elastic registration and other task-specific processing steps. Supervoxels have also been used successfully for the brain tumour segmentation task~\cite{geremia2013spatially}. 
+%In particular, we depart from the usual hand-crafting of powerful features~\cite{cite-examples} and propose a 
+%complementary approach that is entirely generic and free of additional computations. 
+More specifically, we introduce an efficient node-splitting criterion based on 
+cross-validation estimates that improves the feature \textit{selection} during the training stage. Consequently, 
+learnt features are more discriminative and generalize better to unseen data: we refer to this process as 
+\textit{lifting}. Furthermore, the proposed cost function induces a natural stopping condition to grow or prune decision trees, %, in contrast to more ad-hoc recipes based on depth or number of training samples. This results in 
+resulting in an \textit{Occam's razor}-like, principled trade-off between tree complexity and training accuracy. %In addition we experiment with fast and expressive scale-space variants of the intensity-based, generic integral features popularized by Criminisi et al.~\cite{criminisi2013decision}. 
+We show that lifted DFs can outperform standard DFs using compact, shallow tree architectures 
+(several dozens or hundreds of nodes). 
 
-Still in practice, more expressive features yield more
-discriminative node decisions, and therefore %crafting such features has been the primary means to improve the segmentation accuracy of DFs
-improved segmentation accuracy. Tustison et al.~\cite{tustison2013ants,tustison2015optimal} incorporate features derived from the local intensity context and texture, from elastic registration and other task-specific processing steps. Supervoxels have also been used successfully for the brain tumour segmentation task~\cite{geremia2013spatially}. 
-
-In this paper, we depart from hand-crafting powerful features for a complementary approach that is entirely generic and free of additional computations. Section \ref{sec: lifting} introduces an efficient node-splitting criterion based on cross-validation estimates that improves the feature \textit{selection} during the training stage. As a result, learnt features are more discriminative and generalize better to unseen data: we refer to this process as \textit{lifting} the node decisions. 
-Furthermore the proposed cost function induces a natural stopping condition to grow or prune decision trees, %, in contrast to more ad-hoc recipes based on depth or number of training samples. This results in 
-resulting in an \textit{Ockham razor}-like, principled trade-off between tree complexity and training accuracy. %In addition we experiment with fast and expressive scale-space variants of the intensity-based, generic integral features popularized by Criminisi et al.~\cite{criminisi2013decision}. 
-We show that lifted DFs outperform standard DFs for a fraction of their computational resources, using compact, shallow tree architectures (several dozens or hundreds of nodes). 
-
-We exploit these computational gains to revisit \textit{auto-context}~\cite{tu2008auto,tu2010auto} segmentation forests (section \ref{sec: cascading}). In the DF framework, reasoning about semantics is indirect: the algorithm reasons about the \textit{intensity} of neighbouring voxels to decide which label assignment is likely. We want the algorithm to reason directly about semantics, \eg classify a voxel of interest based on neighbouring voxels' \textit{label assignment} probabilities. In \cite{shotton2008semantic}, Shotton et al.~train two successive forest layers, augmenting the latter with the output of the former. We extend the approach, experimenting with a meta-architecture of cascaded DFs that naturally intertwine high-level \textit{semantic} reasoning with \textit{intensity}-based low-level reasoning. The framework aims to be practical: the per-layer training is simple, modular and robust. Furthermore this sequential design enables the 
-decomposition of complex segmentation tasks into series of simpler subtasks that, for instance, exploit the hierarchical structure between labels (\eg whole tumour, tumour core, enhancing tumour parts). Beyond auto-context, we contribute with a clustering mechanism that exposes the latent data-space semantics encoded within DF pathways. The revealed semantics are exploited to automatically guide classification in subsequent layers (section \ref{sec: clustering}). 
-
-We discuss results and details of the BRATS challenge entry in section \ref{sec: results}.
+We exploit the resulting computational gains to revisit \textit{auto-context}~\cite{tu2008auto,tu2010auto,shotton2008semantic} segmentation forests. 
+%In the DF framework, reasoning about semantics is indirect: the algorithm reasons about the \textit{intensity} of 
+%neighbouring voxels to decide which label assignment is likely. We want the algorithm to reason directly about 
+%semantics, \eg classify a voxel of interest based on neighbouring voxels' \textit{label assignment} probabilities. In \cite{shotton2008semantic}, Shotton et al.~train two successive forest layers, augmenting the latter with the output of the former. 
+In particular, we extend the approach with a meta-architecture of cascaded DFs that naturally 
+intertwine high-level \textit{semantic} reasoning with \textit{intensity}-based low-level reasoning. The framework aims to be practical: the per-layer training is simple, modular and robust. Furthermore, this sequential design enables the 
+decomposition of complex segmentation tasks into series of simpler subtasks that, for instance, exploit the hierarchical structure between labels (\eg, whole tumour, tumour core, enhancing tumour parts). Beyond auto-context, another
+contribution is a clustering mechanism that exposes the latent data-space semantics encoded within DF pathways. The 
+learnt semantics are exploited to automatically guide classification in subsequent layers.
+Finally, we discuss results and details of our BRATS challenge entry.
 
 %We experimentally validate \tool{} by applying it to the BRATS 2015 dataset. Our initial results are very
 %promising and are described in Section~\ref{sec:results}.
