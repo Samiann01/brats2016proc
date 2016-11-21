@@ -1,15 +1,38 @@
 %!TEX root = paper.tex
 
-\section{BRATS challenge entry: preprocessing, pipeline architecture \& settings}
+\section{BRATS challenge details: model, pre-processing \& settings}
+
+\subsection{BRATS 2015 dataset}
+
+\subsection{Training}
+
+\noindent
+\textbf{Preprocessing.} Image masks are defined from the FLAIR modality, masking out voxels of intensity $0$. The image contrast is standardized: the distribution of voxel intensities within the mask is brought to a preset, common median and mean absolute error by affine remapping. As a result images are all normalized within the same intensity range, so that the following step is mostly implementation specific. We further window intensity values to make threshold quantization easier when training DFs: intensities are thresholded to lie between some minimum and maximum values and brought within a byte range.\\
+
+\noindent
+\textbf{Initialization: SMM/MRF.} An SMM-MRF layer is used to locate the region of interest (ROI) for the whole tumor. The likelihood for each of the five mutually exclusive ground truth classes is modelled using a Student Mixture (SMM) with spatially varying (BG) or fixed (other classes) proportions~\cite{archambeau2007robust}, as a suitably modified variant of~\cite{cordier2015patch}. An MRF prior is assumed over BG, ED and TC. The model is similar in spirit to~\cite{zhang2001segmentation,menze2010generative}. The model is purely unsupervised: we do not use white/grey matter and cerebro-spinal fluid labels in the current implementation. However the learnt components for the background SMM are highly correlated to those labels. We assume another MRF prior over voxel assignments to the background SMM components, encoding the rough intuition that WM/GM/CSF should smoothly vary spatially. Variational Bayesian inference is used at training and test time. Both MRFs define fully connected cliques over the image, with Gaussian decay of pairwise potentials w.r.t. the distance of voxel centers. For this choice of potentials, the dependencies induced by MRF priors in variational updates can be efficiently computed via Gaussian filtering. Inference over $3D$ volumes is very fast both at training (seconds or minutes) and test time (seconds).\\
+
+\noindent
+\textbf{Auto-context architecture.} $9$ layers of binary DFs are cascaded, cycling between WT, TC and ET probabilities. All layers use the original, raw image channels. The first layers have their input augmented with probability maps from the upstream SMM/MRF, the subsequent layers use probability maps output by previous DFs. In addition, the first $3$ layers are also passed the prior probability "atlas" maps returned by the spatially-varying background SMM/MRF model. \\
+
+\noindent
+\textbf{ROI refinement.} For computational convenience, subsequent layers run on ROIs rather than the full image. For instance, the second WT binary DF only tests points within the mask provided by the first WT binary DF. Similarly at training time, the second layer is trained on subsets of image voxels within the respective image ROIs output by the first layer. The first, second and third layers use masks obtained as dilated versions of the segmentation masks output by the previous layer (dilated resp. by $15$mm, $10$mm, $5$mm).\\
+
+\noindent
+\textbf{Other settings.} DFs come with a number of parameters, most of which where not found to drastically affect the pipeline accuracy. Between $100$ and $200$ candidate features per node. $100$ thresholds.
+
+\subsection{BRATS 2016 test dataset}
+
+The pipeline described above is fully automated. To the authors' knowledge, the BRATS 2015 training dataset pre-processing includes: rigid registration (as well as resampling to a common image geometry), bias field correction and skull removal~\cite{menze2015multimodal}. The BRATS 2016 test dataset contains a number of images for which the preprocessing is not done or only partial (cf.~Fig.~\ref{}). To cope with that, our pipeline was modified to include rigid registration and resampling, bias field correction~\cite{tustison2009n4itk} and skull removal as part of a semi-automatic pre-processing step.
+
+\subsection{Experimental setting \& running time}
+
+The proposed approach is implemented in C\# and F\#. All experiments were performed on a 3.6GHz Intel Xeon processor system with 16GB RAM running Microsoft Windows 10. Training on the BRATS 2015 dataset took $6$ to $7$ hours (including "testing" on the whole dataset). Testing took about $20$s per image.
 
 \section{Experiments \& Results}
 \label{sec: results}
 
-\subsection{Experimental setting}
 
-The proposed approach is implemented within the DF framework described in~\cite{zikic2012decision}. All experiments were performed on a 
-3.6GHz Intel Xeon processor system with 16GB RAM running Microsoft Windows 10.
-Windowing details, etc.
 
 %\subsection{Hold-out estimates, auto-context, guided bagging: an analysis}
 %This is what we have been doing throughout the paper. Singling out individual contributions.
