@@ -1,0 +1,93 @@
+\documentclass[runningheads,a4paper]{llncs}
+\usepackage{makeidx}
+\usepackage[english]{babel}
+\usepackage{authblk}
+%\usepackage{natbib}
+
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\usepackage{amssymb}
+
+\usepackage{bm}
+\usepackage{upgreek}
+\usepackage{algorithmic}
+\usepackage[vlined,ruled]{algorithm2e}
+\usepackage{soul,xcolor}
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+% Include other packages here, before hyperref.
+
+% If you comment hyperref and then uncomment it, you should delete
+% egpaper.aux before re-running latex.  (Or just hit 'q' on the first latex
+% run, let it finish, and you should be clear).
+\usepackage[pagebackref=true,breaklinks=true,letterpaper=true,colorlinks,bookmarks=false]{hyperref}
+
+\begin{document}
+
+\mainmatter
+
+%%%%%%%%% TITLE
+\title{Lifted Auto-Context Forests for Brain Tumour Segmentation%Spectral Kernels, Probabilistic PCA and Clustering of Shapes%Bayesian Spectral Kernel Clustering of Shapes}
+}
+\titlerunning{Lifted Auto-Context Forests for BRATS%Bayesian Spectral Kernel Clustering}
+}
+
+\author{Loic Le Folgoc \and Aditya V. Nori \and Siddharth Ancha \and Antonio Criminisi}
+\authorrunning{Le Folgoc et al.}
+\institute{Microsoft Research Cambridge, UK.}
+
+\toctitle{}
+\tocauthor{}
+\maketitle
+
+\input macros
+
+%%%%%%%%% REVIEWER IDEAS
+% Ben Glocker
+% Nassir Navab
+% Ender Konukoglu?
+% Alison Noble?
+% Bjoern Menze
+
+%%%%%%%%% ABSTRACT
+\begin{abstract}
+\input abstract
+\end{abstract}
+
+%%%%%%%%% BODY TEXT
+
+\input introduction
+
+\input background
+
+\input algorithm-features
+
+\input algorithm-lifting
+
+\input algorithm-cascading
+
+\input results
+
+\input discussion
+
+\input conclusion
+
+\section*{Acknowledgment}
+
+The authors would like to thank...
+Microsoft Inria Joint Centre
+
+{\small
+\bibliographystyle{splncs03}
+\bibliography{paper}
+}
+
+\appendix
+
+\end{document}
