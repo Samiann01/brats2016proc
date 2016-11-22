@@ -8,7 +8,7 @@
 The BRATS 2015 dataset was available to participants of the challenge. 
 It contains $274$ images together with their ground truth annotations. 
 One of the interesting aspects of the dataset is the nature of ground truth annotations: $30$ images 
-(from the BRATS 2013 dataset) were manually annotated and the remaining were annotated using a consensus of 
+(from the BRATS 2013 dataset) were manually annotated, and the remaining were annotated using a consensus of 
 segmentation algorithms~\cite{menze2015multimodal}. 
 While the ground truth is often of good quality, we note with interest that the consensus of algorithms generally fails at correctly labelling post-resection cavities as in Fig.~\ref{fig:post-resection-cavities} (bottom row). This is likely due to the fact that there is only \textit{one} such training example in the original BRATS 2013 dataset (Fig. \ref{fig:post-resection-cavities}, top row). 
 
@@ -55,6 +55,8 @@ The pipeline described above is fully automated. To our knowledge, the BRATS 201
 \section{Results}
 \label{sec: results}
 
-The proposed approach is implemented in C\# and F\#. All experiments were performed on a 3.6GHz Intel Xeon processor system with 16GB RAM running Microsoft Windows 10. Training on the BRATS 2015 dataset takes $6$ to $7$ hours (including "testing" on the whole dataset). Testing takes about $20$s per image.
+The proposed approach is implemented in a .NET based DF framework which we call \textsc{Bonsai}. All experiments were performed on a 3.6GHz Intel Xeon processor 
+system with 16GB RAM running Microsoft Windows 10. Training on the BRATS 2015 dataset takes 
+around $6$ to $7$ hours (including "testing" on the whole dataset). Testing takes about $20$ seconds per image.
 
-The model is trained as described previously on $70$ images from the BRATS 2015 training set (about $1/4$th). Table \ref{} reports accuracy over the remaining of the BRATS 2015 dataset. These numbers are comparable to those reported in the recent state-of-the-art \eg~\cite{kamnitsas2016efficient}. It is interesting to compare these numbers against the performance on the BRATS 2016 test set. Exact DICE scores are not available but, as an order of magnitude they are as follows: about $80\%$ for WT, $60\%$ for TC and over $70\%$ for ET. This shows a satisfactory generalization to unseen data given the difficulty of the task. Proper delineation of the tumour core seems to remain the most challenging task, perhaps due to the high variability of appearance across images and glioma types.
+The model is trained as described previously on $70$ images from the BRATS 2015 training set (about $1/4$th). Table \ref{} reports accuracy over the remaining of the BRATS 2015 dataset. These numbers are comparable to those reported in the recent state-of-the-art \eg~\cite{kamnitsas2016efficient}. It is interesting to compare these numbers against the performance on the BRATS 2016 test set. Exact DICE scores are not available but, they are roughly as follows: about $80\%$ for WT, $60\%$ for TC and over $70\%$ for ET. This shows a satisfactory generalization to unseen data given the difficulty of the task. Proper delineation of the tumour core seems to remain the most challenging task, perhaps due to the high variability of appearance across images and glioma types.
