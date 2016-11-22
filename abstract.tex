@@ -1,3 +1,14 @@
 %!TEX root = paper.tex
 
-We revisit Auto-Context Forests for brain tumour segmentation in multi-channel magnetic resonance images. Semantic context is progressively built and refined via successive layers of Decision Forests (DFs). This sequential approach allows to decompose complex segmentation tasks into a series of simpler subtasks, \eg one that encodes the hierarchical structure between labels. Our contribution is threefold. 1) \textit{Improved generalization:} we introduce an efficient node-splitting criterion based on hold-out estimates of generalization to enhance the discriminative power of nodes in decision ensembles. 2) \textit{Increased compactness:} at a tree-level we derive a principled, assumption-free trade-off between data-fit and model complexity, thereby yielding shallow discriminative ensembles trained orders of magnitude faster. 3) \textit{Guided semantic bagging:} we expose latent data-space semantics captured by forest pathways and specialize subsequent classifiers over the resulting semantic regions to boost accuracy. The proposed framework is practical: the per-layer training is fast, modular and robust. It was a top performer in the MICCAI 2016 BRATS (\uline{Bra}in \uline{T}umour \uline{S}egmentation) challenge, and this paper aims to discuss and provide details about the challenge entry.
+We revisit Auto-Context Forests for brain tumour segmentation in multi-channel magnetic resonance images. 
+Semantic context is progressively built and refined via successive layers of Decision Forests (DFs). 
+%This sequential approach allows to decompose complex segmentation tasks into a series of simpler subtasks, \eg one that encodes the hierarchical structure between labels. 
+Specifically, we make the following contributions: 1) \textit{improved generalization} via an efficient 
+node-splitting criterion based on hold-out estimates,
+%of generalization to enhance the discriminative power of nodes in decision ensembles. 
+2) \textit{increased compactness} at a tree-level,
+%we derive a principled, assumption-free trade-off between data-fit and model complexity, 
+thereby yielding shallow discriminative ensembles trained orders of magnitude faster, and 3) 
+\textit{guided semantic bagging} that exposes latent data-space semantics captured by forest pathways.
+%and specialize subsequent classifiers over the resulting semantic regions to boost accuracy. 
+The proposed framework is practical: the per-layer training is fast, modular and robust. It was a top performer in the MICCAI 2016 BRATS (\uline{Bra}in \uline{T}umour \uline{S}egmentation) challenge, and this paper aims to discuss and provide details about the challenge entry.
