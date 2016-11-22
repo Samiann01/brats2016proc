@@ -3,7 +3,7 @@
 \section{Auto-context forests for brain tumour segmentation}
 \label{sec: cascading}
 
-We investigate cascaded DF architectures: the classifier consists of layers of DFs partially or fully connected via their output posterior maps. 
+We investigate cascaded DF architectures, made of layers of DFs partially or fully connected via their output posterior maps. 
 %Each layer solves a separate subtask, improves upon the current prediction or both. %DNs form a powerful and flexible meta-framework for high precision vision tasks such as medical image segmentation. 
 This architecture naturally interleaves high-level \textit{semantic} reasoning with \textit{intensity}-based low-level 
 reasoning. We demonstrate this via two ideas: a) \textit{auto-context}: allowing downstream layers to reason about 
@@ -45,8 +45,9 @@ While many variants can reasonably be built, the final architecture that we used
 %commonly contain several distinct "clusters" of data, \eg two subtypes of anomalies under identical labels, or subgroups of images with varying acquisition protocols. In that case cluster proportions in the training data are often arbitrary, similarly to the proportions between background and foreground labels. While boosting may partially address the issue, its simplest variants are sensitive to mislabelling in the training data~\cite{long2009adaptive,long2010random} (as commonly occurs in manually annotated datasets) whereas noise-tolerant alternatives remain more intricate and costly. 
 
 Given Auto-Context Forests, a natural idea is to progressively refine the region of interest (ROI) after each layer, starting from an initial over-approximation of the ROI (\eg, the full image). Downstream DFs are trained on 
-more refined ROIs that exclude irrelevant background clutter, thereby increasing accuracy.
-%This closely relates to class rebalancing and boosting. ROIs are usually obtained via simple mathematical morphology. With such an approach, it is crucial to maintain high recall throughout the procedure, as false negatives may be definitively excluded. We investigate an alternative approach that circumvents these limitations, making ROI refinement a computational convenience.
+more refined ROIs that exclude irrelevant background clutter, thereby increasing accuracy. 
+%This closely relates to class rebalancing and boosting. ROIs are usually obtained via simple mathematical morphology. 
+Such an approach is at risk of excluding false negatives, creating a trade-off between coarser ROIs (high recall) and tighter ROIs (high precision). We investigate a complementary strategy to circumvent this limitation. ROI refinement remains as a computational convenience.
 
 The proposed approach exposes and exploits the latent semantics already captured within a given DF as follows. Each data point is identified with the collection of tree paths that it traverses at test time. A metric $d_{\text{DP}}$ is defined over such collections of tree paths (\textit{decision pathways}), assigning smaller distance between points following similar paths across many trees, and data clusters are identified by $k$-means w.r.t. $d_{\text{DP}}$. % say a word about how the centroid is computed
 Then, cluster-specific DFs are trained over the corresponding training data. At test time, data points are assigned to the cluster with closest centroid and the corresponding DF is used for prediction.
