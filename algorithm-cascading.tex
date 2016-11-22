@@ -52,11 +52,18 @@ Such an approach is at risk of excluding false negatives, creating a trade-off b
 The proposed approach exposes and exploits the latent semantics already captured within a given DF as follows. Each data point is identified with the collection of tree paths that it traverses at test time. A metric $d_{\text{DP}}$ is defined over such collections of tree paths (\textit{decision pathways}), assigning smaller distance between points following similar paths across many trees, and data clusters are identified by $k$-means w.r.t. $d_{\text{DP}}$. % say a word about how the centroid is computed
 Then, cluster-specific DFs are trained over the corresponding training data. At test time, data points are assigned to the cluster with closest centroid and the corresponding DF is used for prediction.
 
-Our key insight is that data points that are clustered together will share common underlying semantics, as they jointly satisfy many predicates. A wide range of metrics can be designed and for the sake of simplicity, we define (given a collection $\calT$ of trees):
+Our key insight is that data points that are clustered together will share common underlying semantics, as they jointly satisfy many predicates (see Fig.~\ref{fig: clusters}). A wide range of metrics can be designed and for the sake of simplicity, we define (given a collection $\calT$ of trees):
 \begin{equation}
 d_{\text{DP}}^{\calT}(\brmx_i, \brmx_j)\triangleq \sum_{t=1}^{\vert\calT\vert} \left(\frac{1}{2}\right)^{\text{depth}_t^{\calT}\!(\brmx_i,\brmx_j)}\, ,
 \end{equation}
 where $\brmx_i, \brmx_j$ are two points, and $\text{depth}_t^{\calT}(\brmx_i,\brmx_j)$ is the depth of the deepest common node in both paths for the $t$-th tree ($+\infty$ if the paths are identical).
 % Figure caption maybe: Given the necessary information, an intuitive solution would be to train a classifier specifically over the boundary region, because cues that are too unreliable over the full image may still be strongly discriminative
+
+\begin{figure}
+\centering
+\includegraphics[width=1\columnwidth]{images/clusters-illustration.png}
+\label{fig: clusters}
+\caption{Voxel cluster assignments for an example subject. Clusters for WT and TC binary forests are learned independently. $4$ clusters are used for each and assignments are colour coded in gray levels. On this task clusters naturally appear to relate to "boundary" regions of higher uncertainty and higher certainty regions ("inside" the tumour or the BG).}
+\end{figure}
 
 % maybe turn it into a single big figure* that shows 1) an illustration of the centroids? 2) the automatically inferred semantics 3) example segmentations with ROI refinement only and with clustering 4) plot the accuracy gain: no ROI refinement vs. 2 settings of ROI refinement only vs the same two settings with clustering, on a suitable example.
