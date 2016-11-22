@@ -8,7 +8,7 @@ We investigate cascaded DF architectures, made of layers of DFs partially or ful
 This architecture naturally interleaves high-level \textit{semantic} reasoning with \textit{intensity}-based low-level 
 reasoning. We demonstrate this via two ideas: a) \textit{auto-context}: allowing downstream layers to reason about 
 semantics captured in upstream layers, and b) \textit{decision pathway clustering}: latent data-space semantics are 
-revealed by clustering \textit{decision pathways} and cluster-specific DFs are trained. 
+revealed by clustering decision pathways and cluster-specific DFs are trained. 
 
 \subsection{Building and training Auto-Context Forests}
 
@@ -47,7 +47,7 @@ While many variants can reasonably be built, the final architecture that we used
 Given Auto-Context Forests, a natural idea is to progressively refine the region of interest (ROI) after each layer, starting from an initial over-approximation of the ROI (\eg, the full image). Downstream DFs are trained on 
 more refined ROIs that exclude irrelevant background clutter, thereby increasing accuracy. 
 %This closely relates to class rebalancing and boosting. ROIs are usually obtained via simple mathematical morphology. 
-Such an approach is at risk of excluding false negatives, creating a trade-off between coarser ROIs (high recall) and tighter ROIs (high precision). We investigate a complementary strategy to circumvent this limitation. ROI refinement remains as a computational convenience.
+Such an approach runs the risk of excluding false negatives, creating a trade-off between coarser ROIs (high recall) and tighter ROIs (high precision). We investigate a complementary strategy to circumvent this limitation. ROI refinement remains as a computational convenience.
 
 The proposed approach exposes and exploits the latent semantics already captured within a given DF as follows. Each data point is identified with the collection of tree paths that it traverses at test time. A metric $d_{\text{DP}}$ is defined over such collections of tree paths (\textit{decision pathways}), assigning smaller distance between points following similar paths across many trees, and data clusters are identified by $k$-means w.r.t. $d_{\text{DP}}$. % say a word about how the centroid is computed
 Then, cluster-specific DFs are trained over the corresponding training data. At test time, data points are assigned to the cluster with closest centroid and the corresponding DF is used for prediction.
