@@ -1,9 +1,10 @@
 %!TEX root = paper.tex
 
-\section{Background: Random Forests for Segmentation}
+\section{Background: Random Forests for Image Segmentation}
 \label{sec: background}
 
-We begin with a brief summary of the randomized decision forest framework for image segmentation. Image segmentation is cast as a voxelwise classification task. Let $I\eq\{I_j\}_{j=1\!\cdots\! J}$ the set of input channels in a multichannel image, $x$ a pixel and $c\!\in\!\calC\eq\{1 \dots K\}$ the label to predict. We define $\brmx\eq\{x,I\}\!\in\!\calX$ as the feature vector of $x$. DF classifiers predict the probability $p(c\vert\brmx)$ for voxel $x$ to have label $c$ given its feature representation $\brmx$ by aggregating predictions of an ensemble $\calT$ of $t\!=\!1\cdots \vert\calT\vert$ decision trees. Simple averaging is widely used, so that 
+%We begin with a brief summary of the randomized decision forest framework for image segmentation. Image segmentation is cast as a voxelwise classification task. 
+Let $I\eq\{I_j\}_{j=1\!\cdots\! J}$ be the set of input channels in a multichannel image, $x$ a voxel, and $c\!\in\!\calC\eq\{1 \dots K\}$ be the label to predict. We define $\brmx\eq\{x,I\}\!\in\!\calX$ as the feature vector of $x$. DF classifiers predict the probability $p(c\vert\brmx)$ for voxel $x$ to have label $c$ given its feature representation $\brmx$ by aggregating predictions of an ensemble $\calT$ of $t\!=\!1\cdots \vert\calT\vert$ decision trees. Simple averaging is widely used, so that 
 $$p(c\vert\brmx)\eq1/\vert\calT\vert\cdot\sum_{t=1}^{\vert\calT\vert}p_t(c\vert\brmx)\, ,$$
 where $p_t(c\vert\brmx)$ stands for the $t$-th tree prediction. The class of maximum probability is then returned (maximum a posteriori assignment). 
 
