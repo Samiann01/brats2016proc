@@ -9,7 +9,7 @@ and $c\!\in\!\calC\eq\{1 \dots K\}$ be the class to predict for $x$.
 We define $\brmx\eq\{x,I\}\!\in\!\calX$ as the feature vector of $x$. DF classifiers predict the probability 
 $p(c\vert\brmx)$ that a voxel $x$ belongs to class $c$ given its feature representation $\brmx$. 
 This is done by aggregating 
-predictions of an ensemble $\calT$ decision trees. Simple averaging is typically used, so that: 
+predictions of an ensemble of $\calT$ decision trees. Simple averaging is typically used, so that: 
 $$p(c\vert\brmx)\eq1/\vert\calT\vert\cdot\sum_{t=1}^{\vert\calT\vert}p_t(c\vert\brmx)\, ,$$
 where $p_t(c\vert\brmx)$ denotes the prediction by tree $t \in \mathcal{T}$. 
 The class with maximum probability is then returned (maximum a posteriori probability) as the prediction. 
@@ -43,7 +43,6 @@ Similarly, only a random subset $D_n'\!\varsubsetneq\!D_n$ of training examples 
 Data bagging is implemented both at an image level (random image subsets) and at a voxel level (random voxel subsets). 
 %At test time (for a previously unseen image) of course, each voxel on the image grid is sent through the forest for its label to be predicted. 
 
-\todo{Emphasize this in Section 5.2}
 It is important to note that we do \textit{not} make use of class rebalancing schemes. Training samples are often 
 weighted according to the relative frequency of their class. This strategy aims to correct classifier bias in favor of 
 the more frequent class, in cases where there is a large class imbalance. Of course, class rebalancing induces the 
