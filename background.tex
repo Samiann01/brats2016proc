@@ -4,25 +4,48 @@
 \label{sec: background}
 
 %We begin with a brief summary of the randomized decision forest framework for image segmentation. Image segmentation is cast as a voxelwise classification task. 
-Let $I\eq\{I_j\}_{j=1\!\cdots\! J}$ be the set of input channels in a multichannel image, $x$ a voxel, and $c\!\in\!\calC\eq\{1 \dots K\}$ be the label to predict. We define $\brmx\eq\{x,I\}\!\in\!\calX$ as the feature vector of $x$. DF classifiers predict the probability $p(c\vert\brmx)$ for voxel $x$ to have label $c$ given its feature representation $\brmx$ by aggregating predictions of an ensemble $\calT$ of $t\!=\!1\cdots \vert\calT\vert$ decision trees. Simple averaging is widely used, so that 
+Let $I\eq\{I_j\}_{j=1\!\cdots\! J}$ be the set of input channels in a multichannel image, $x$ be a voxel, 
+and $c\!\in\!\calC\eq\{1 \dots K\}$ be the class to predict for $x$.
+We define $\brmx\eq\{x,I\}\!\in\!\calX$ as the feature vector of $x$. DF classifiers predict the probability 
+$p(c\vert\brmx)$ that a voxel $x$ belongs to class $c$ given its feature representation $\brmx$. 
+This is done by aggregating 
+predictions of an ensemble $\calT$ decision trees. Simple averaging is typically used, so that: 
 $$p(c\vert\brmx)\eq1/\vert\calT\vert\cdot\sum_{t=1}^{\vert\calT\vert}p_t(c\vert\brmx)\, ,$$
-where $p_t(c\vert\brmx)$ stands for the $t$-th tree prediction. The class of maximum probability is then returned (maximum a posteriori assignment). 
-
-Tree predictions are obtained as follows. Points $\brmx$ are routed down the tree from the root node by evaluating at every internal (\textit{split}) node $n\!\in\!\calS$ along the path a routing function $h_n(\brmx)\triangleq[f(\brmx,\bm{\theta}_n)\!\leq\!\tau_n]\!\in\!\{0,1\}$, moving down to the left child $n_L$ whenever $h_n(\brmx)\!=\!1$ and to the right child $n_R$ otherwise, until a leaf node $n(\brmx)$ is reached. Here $f\!:\calX\!\times\!\Theta\mapsto\R$ is a weak learner parametrized by some node-specific feature $\bm{\theta}_n\!\in\!\Theta$ and $\tau_n\!\in\!\R$ a node-specific threshold. Examples of weak learners are given in section \ref{sec: features}. Each terminal (\textit{leaf}) node $n\!\in\!\calL$ is paired with a class predictor $p_n(c\vert \brmx)\!\triangleq\!p_n(c)$ such that $0\!\leq\!p_n(c)\!\leq\!1$, $\sum_{c=1}^Kp_n(c)\!=\!1$. The tree then predicts class $c$ with probability $p_{n(\brmx)}(c)$. 
+where $p_t(c\vert\brmx)$ denotes the prediction by tree $t \in \mathcal{T}$. 
+The class with maximum probability is then returned (maximum a posteriori probability) as the prediction. 
+Tree predictions are obtained as follows: a feature vector $\brmx$ is routed along a path in the tree from the 
+root node by evaluating it at every internal (\textit{split}) node $n$ w.r.t. a routing function 
+$h_n(\brmx)\triangleq[f(\brmx,\bm{\theta}_n)\!\leq\!\tau_n]\!\in\!\{0,1\}$, and taking the 
+left child $n_L$ if $h_n(\brmx)\!=\!1$, and the right child $n_R$ otherwise, until a leaf node $n(\brmx)$ is reached. 
+Here $f\!:\calX\!\times\!\Theta\mapsto\R$ is a weak learner parameterized by a node-specific feature 
+$\bm{\theta}_n\!\in\!\Theta$, and $\tau_n\!\in\!\R$ a node-specific threshold. Examples of weak learners are given in section \ref{sec: features}. Each terminal (\textit{leaf}) node $n\!\in\!\calL$ is paired with a class predictor $p_n(c\vert \brmx)\!\triangleq\!p_n(c)$ such that $0\!\leq\!p_n(c)\!\leq\!1$, $\sum_{c=1}^Kp_n(c)\!=\!1$. The tree then predicts class $c$ with probability $p_{n(\brmx)}(c)$. 
 
 %A decision tree consists of a proper binary tree structure, whose internal nodes $n\!\in\!\calS$ are paired with a binary-valued node routing function $h_n$, and whose terminal (\textit{leaf}) nodes $n\!\in\!\calL$ are paired with a class predictor $p_n(c\vert \brmx)\!\triangleq\!p_n(c)$ such that $0\!\leq\!p_n(c)\!\leq\!1$, $\sum_{c=1}^Kp_n(c)\!=\!1$. Points $\brmx$ are routed down the tree starting from the root node by evaluating routing functions $h_n(\brmx)\triangleq[f(\brmx,\bm{\theta}_n)\!\leq\!\tau_n]\!\in\!\{0,1\}$ along the path, moving down to the left child $n_L$ whenever $h_n(\brmx)\!=\!1$ and to the right child $n_R$ otherwise, until a leaf node $n(\brmx)$ is reached. The tree then predicts class $c$ with probability $p_{n(\brmx)}(c)$. Here $f\!:\calX\!\times\!\Theta\mapsto\R$ is a weak learner parametrized by some node-specific feature $\bm{\theta}_n\!\in\!\Theta$ and $\tau_n\!\in\!\R$ a node-specific threshold. Examples of weak learners are given in section \ref{sec: features}.
 
-Decision trees are trained in a supervised manner from training data $D\eq\{\brmx_i,c_i\}_{i=1}^N$ with known labels $c_i$, greedily and recursively, starting from a single root node. Training a node $n$ consists of finding the optimal feature $\bm{\theta}_n^\ast$ and threshold $\tau_n^\ast$ so that the node training data $D_n\eq\{\brmx_i,c_i\}_{i\in\calI_n}$ is split between left and right children $n_L$ and $n_R$ in a way that maximizes class purity. Specifically, $\psi^\ast\eq(\bm{\theta}_n^\ast, \tau_n^\ast)$ and the resulting split $D_n\eq D_{n_L}(\psi)\coprod D_{n_R}(\psi)$ maximize the Information Gain $\text{IG}(\psi; D_n)$ of Eq. \eqref{eq: IG maximization}:
+Decision trees are trained in a supervised manner from training data $D\eq\{\brmx_i,c_i\}_{i=1}^N$ with known 
+class labels $c_i$, greedily and recursively, starting from a single root node. Training a node $n$ entails 
+finding the optimal feature $\bm{\theta}_n^\ast$ and threshold $\tau_n^\ast$ such that the node training data 
+$D_n\eq\{\brmx_i,c_i\}_{i\in\calI_n}$ is split between left and right children $n_L$ and $n_R$ in a way that maximizes 
+class purity. Specifically, $\psi^\ast\eq(\bm{\theta}_n^\ast, \tau_n^\ast)$ and the resulting split 
+$D_n\eq D_{n_L}(\psi)\coprod D_{n_R}(\psi)$ maximize the Information Gain $\text{IG}(\psi; D_n)$ 
+defined as follows:
 \begin{equation}
 \sum_{\epsilon=\{L,R\}} \frac{\vert D_{n_\epsilon}(\psi)\vert}{\vert D_n\vert}\sum_{c\in\calC}p_{n_\epsilon}(c;\psi)\log{p_{n_\epsilon}(c;\psi)} \\ 
  -\sum_{c\in\calC}p_{n}^\ast(c)\log{p_{n}^\ast(c)}\, ,
 \label{eq: IG maximization}
 \end{equation}
-where $p_{n_\epsilon}(c;\psi)\triangleq\left\vert\{i\!\in\!\calI_{n_\epsilon}\!(\psi)\vert c_i\eq c\}\right\vert/\left\vert D_{n_\epsilon}(\psi)\right\vert$ is the empirical class distribution in the training data $D_{n_\epsilon}$ for the child node $n_\epsilon$. The optimum $\psi^\ast\!\triangleq\! \argmax_{\psi}\text{IG}(\psi; D_n)$ is found by exhaustive search after proper quantization of thresholds $\tau_n$. Trees are grown up to some maximum depth or until too few training examples reach a given node.
+where $p_{n_\epsilon}(c;\psi)\triangleq\left\vert\{i\!\in\!\calI_{n_\epsilon}\!(\psi)\vert c_i\eq c\}\right\vert/\left\vert D_{n_\epsilon}(\psi)\right\vert$ is the empirical class distribution in the training data $D_{n_\epsilon}$ for the child node $n_\epsilon$. The optimum $\psi^\ast\!\triangleq\! \argmax_{\psi}\text{IG}(\psi; D_n)$ is found by exhaustive search after proper quantization of thresholds $\tau_n$. Trees are grown up to a predefined 
+maximum depth, or until the number of training examples reaching a node is below a given threshold.
 
 Last but not least, random forests introduce randomization in the training of each tree via feature and data \textit{bagging}. For the $t$-th tree and at node $n\in\calV_t$, only a random subset $\Theta' \!\varsubsetneq\! \Theta$ of candidate features is considered for training \cite{amit1997shape,ho1998random}. %Beyond obvious computational gains, 
 %This is a practical form of model averaging: across trees, a range of marginally suboptimal features $\bm{\theta} \!\in\!\Theta$ are selected, which would otherwise be discarded in favour of a single, marginally score-maximizing feature.\\
 Similarly, only a random subset $D_n'\!\varsubsetneq\!D_n$ of training examples sampled with(out) replacement is used \cite{breiman1996bagging}. %This reduces the variance of learned predictors and brings drastic computational gains.
-Data bagging is implemented both at an image level (random image subsets) and at a voxel level (random voxel subsets). At test time (for a previously unseen image) of course, each voxel on the image grid is sent through the forest for its label to be predicted. 
+Data bagging is implemented both at an image level (random image subsets) and at a voxel level (random voxel subsets). 
+%At test time (for a previously unseen image) of course, each voxel on the image grid is sent through the forest for its label to be predicted. 
 
-Note that we do \textit{not} make use of class rebalancing schemes. Training samples are often weighted according to the relative frequency of their class whenever summing over training examples. This aims to correct classifier bias in favor of the more frequent class, in case of large class imbalance. Of course class rebalancing induces the opposite bias against more prevalent classes, which can be inextricable in a multilabel setting. Section \ref{sec: clustering} discusses an alternative strategy to naturally correct for distribution imbalance.
+\todo{Emphasize this in Section 5.2}
+It is important to note that we do \textit{not} make use of class rebalancing schemes. Training samples are often 
+weighted according to the relative frequency of their class. This strategy aims to correct classifier bias in favor of 
+the more frequent class, in cases where there is a large class imbalance. Of course, class rebalancing induces the 
+opposite bias against more prevalent classes, which cannot be avoided in a multilabel classification setting. 
+Section \ref{sec: clustering} discusses an alternative strategy to naturally correct for distribution imbalance.
