@@ -3,16 +3,21 @@
 \section{Lifting Decision Forests by Minimizing Cross-Validation Error Estimates}
 \label{sec: lifting}
 
+\todo{cautionary?}
 \subsection{A cautionary look at Information Gain maximization}
 
-We follow the notations of section \ref{sec: background} but drop the node index $n$ for convenience. Information gain maximization w.r.t. (feature, threshold) parameters $\psi=(\bm{\theta},\tau)$ can be shown to be equivalent to a joint maximum likelihood estimation (MLE) of $\phi\!\triangleq\!(\psi,p_L,p_R)$, the node parameters and children' class predictors. Details are omitted for brevity. In other words, decision trees are usually grown by greedily, recursively splitting leaf nodes by likelihood maximization:
+We follow the notation introduced in Section~\ref{sec: background}, but drop the node index $n$ for convenience. 
+Information gain maximization w.r.t. (feature, threshold) parameters $\psi=(\bm{\theta},\tau)$ can be shown to be equivalent to a joint maximum likelihood estimation (MLE) of $\phi\!\triangleq\!(\psi,p_L,p_R)$, the node parameters and children' class predictors. We omit the details for the sake of brevity. Essentially, decision trees are usually grown by 
+greedily, recursively splitting leaf nodes by likelihood maximization:
 \begin{equation}
 \phi^\ast = \argmax_{\phi} \; \calC\!\calF(D;\phi) \triangleq \frac{p(D;\phi)}{p^\ast(D)} \, .
 \label{eq: ML maximization}
 \end{equation}
 In Eq.~\eqref{eq: ML maximization}, the denominator is the data likelihood using the current leaf node predictor, whereas the numerator is the data likelihood when splitting this node with parameters $\phi$ into left and right children. The denominator is constant w.r.t. $\phi$, as optimization of the current node has precedence in the recursive schedule. 
 
-Unfortunately MLE is subject to overtting. With DFs the risk is twofold. At a node-level, weak learners with poor generalization may be selected. The deeper the trees, the more likely it is to happen, since the training data is split between an exponentially increasing number of nodes. At a tree-level, the lack of principled control of model capacity negatively impacts generalization. Indeed the information gain of Eq.~\eqref{eq: ML maximization} is strictly positive as long as 1) training samples remain at the node of interest 2) the data distribution is not pure. As a result trees generally grow to the maximum allowed depth, with little control over generalization. Medical image segmentation tasks often call for large trees of weak learners to be grown (tree depth $20$--$30$, millions of nodes). Due to computational constraints, few such trees can be grown (a few dozens at most), so that model averaging across randomized trees is insufficient to balance tree overfitting. As an efficient alternative to MLE that can be directly used to control tree growth and generalization, we propose to maximize the predictive score as obtained from \textit{cross-validation} estimates.
+Unfortunately, with MLE, we run the risk of overfitting. With DFs the risk is twofold. At a node-level, weak learners with poor generalization may be selected. The deeper the trees, the more likely it is to happen, since the training data is split between an exponentially increasing number of nodes. At a tree-level, the lack of principled method
+for controlling model capacity negatively impacts generalization. Indeed, the information gain of Eq.~\eqref{eq: ML maximization} is strictly positive as long as 1) training samples remain at the node of interest, and 
+  2) the data distribution is not pure. As a result, trees generally grow to the maximum allowed depth, with little control over generalization. Medical image segmentation tasks often require large trees of weak learners to be grown (tree depth $20$--$30$, millions of nodes). Due to computational constraints, few such trees can be grown (a few dozens at most), so that model averaging across randomized trees is insufficient to balance tree overfitting. As an efficient alternative to MLE that can be directly used to control tree growth and generalization, we propose to maximize the predictive score as obtained from \textit{cross-validation} estimates.
 
 \subsection{Maximizing Cross Validation Estimates of Generalization}   
 \label{sec: CVE}
