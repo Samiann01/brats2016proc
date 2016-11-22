@@ -3,7 +3,6 @@
 \section{Lifting Decision Forests by Minimizing Cross-Validation Error Estimates}
 \label{sec: lifting}
 
-\todo{cautionary?}
 \subsection{A cautionary look at Information Gain maximization}
 
 We follow the notation introduced in Section~\ref{sec: background}, but drop the node index $n$ for convenience. 
@@ -22,7 +21,8 @@ for controlling model capacity negatively impacts generalization. Indeed, the in
 \subsection{Maximizing Cross Validation Estimates of Generalization}   
 \label{sec: CVE}
 
-We derive Cross-Validation Estimates (CVE) of the predictive score as follows. At any given node, the (potentially bagged) training data $D=D^{\text{CV}}\!\coprod\! D^{\text{T}}$ is randomly divided in two disjoint subsets, a tuning subset $D^{\text{T}}$ and a validation subset $D^{\text{CV}}$. The optimization problem is then defined as:
+We derive Cross-Validation Estimates (CVE) of the predictive score as follows. At any given node, the (potentially bagged) training data $D=D^{\text{CV}}\!\coprod\! D^{\text{T}}$ is randomly divided into two disjoint subsets, 
+a tuning subset $D^{\text{T}}$ and a validation subset $D^{\text{CV}}$. The optimization problem is then defined as:
 \begin{equation}
 \begin{split}
 \phi^\ast = & \,\argmax_{\phi} \cfrac{p(D^{\text{CV}};\bm{\theta})}{\raisebox{-0.5ex}{$p^\ast(D^{\text{CV}})$}} \; , \quad \text{s.t. }\\[\medskipamount]
@@ -31,9 +31,10 @@ We derive Cross-Validation Estimates (CVE) of the predictive score as follows. A
 \end{split}
 \label{eq: CV optimization}
 \end{equation}
-where $p(D^{\text{CV}};\bm{\theta})\!\triangleq\! p(D^{\text{CV}};\bm{\theta}, \tau_{\bm{\theta}}, p_\epsilon(\cdot;\bm{\theta}))$. The key change is that parameters are now constrained to be tuned on $D^{\text{T}}$ whereas the final feature score is computed on $D^{\text{CV}}$. While a \textit{k-fold} estimate could be used instead in Eq.~\eqref{eq: CV optimization}, the \textit{hold-out} procedure has the benefit of efficiency and added randomness. 
+where $p(D^{\text{CV}};\bm{\theta})\!\triangleq\! p(D^{\text{CV}};\bm{\theta}, \tau_{\bm{\theta}}, p_\epsilon(\cdot;\bm{\theta}))$. The key change is that parameters are now constrained to be tuned on $D^{\text{T}}$, whereas the final feature score is computed on $D^{\text{CV}}$. While a \textit{k-fold} estimate could be used instead in Eq.~\eqref{eq: CV optimization}, the \textit{hold-out} procedure has the benefit of efficiency and added randomness. 
 
-A simple two stage procedure is followed, akin to that of MLE.% (Algo \ref{}). 
-For each candidate feature $\bm{\theta}$, the best threshold $\tau_{\bm{\theta}}$ is found by IG maximization on the tuning subset $D^{\text{T}}$. Left and right children' class predictors are set to the empirical tuning data histograms. Instead of directly returning the IG as a feature score, the cross-entropy between tuning and validation empirical distributions is computed and returned. As we merely replace the ML feature score by a CV score computed from subsets of readily available data, the computational complexity remains unchanged.
+%A simple two stage procedure is followed, akin to that of MLE. % (Algo \ref{}).
+%For each candidate feature $\bm{\theta}$, the best threshold $\tau_{\bm{\theta}}$ is found by IG maximization on the tuning subset $D^{\text{T}}$. Left and right children' class predictors are set to the empirical tuning data histograms. Instead of directly returning the IG as a feature score, the cross-entropy between tuning and validation empirical distributions is computed and returned. As we merely replace the ML feature score by a CV score computed from subsets of readily available data, the computational complexity remains unchanged.
 
-Key to the proposed approach is that Eq.~\eqref{eq: CV optimization} takes negative values whenever no candidate split yields superior generalization to the current leaf node model. Based on this remark, we implement a greedy scheme to control the tree complexity, where branches that do not increase the score are pruned in a single bottom-up pass as post-processing, similarly to \cite{quinlan1987simplifying}. We further use a simple heuristic to drastically reduce training time, growing trees \textit{in stages} up to any desired maximum depth, successively pruning score-decreasing branches and regrowing remaining, non-pruned ones.
+Key to the proposed approach is that Eq.~\eqref{eq: CV optimization} takes negative values whenever no candidate split 
+yields superior generalization to the current leaf node model. Based on this, we implement a greedy scheme to control the tree complexity, where branches that do not increase the score are pruned in a single bottom-up pass as post-processing, similarly to \cite{quinlan1987simplifying}. We further use a simple heuristic to drastically reduce training time, growing trees \textit{in stages} up to any desired maximum depth, successively pruning score-decreasing branches and regrowing remaining, non-pruned ones.

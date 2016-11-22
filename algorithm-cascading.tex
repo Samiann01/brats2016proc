@@ -3,13 +3,17 @@
 \section{Auto-context forests for brain tumour segmentation}
 \label{sec: cascading}
 
-We investigate cascaded DF architectures: the classifier consists of layers of DFs partially or fully connected via their output posterior maps. Each layer solves a separate subtask, improves upon the current prediction or both. %DNs form a powerful and flexible meta-framework for high precision vision tasks such as medical image segmentation. 
-This architecture naturally allows to interleave high-level \textit{semantic} reasoning with \textit{intensity}-based low-level reasoning. We demonstrate this via two ideas, a) \textit{auto-context}: allowing downstream layers to reason about semantics captured in upstream layers; and b) \textit{decision pathway clustering}: latent data-space semantics are revealed by clustering \textit{decision pathways} and cluster-specific DFs are trained. 
+We investigate cascaded DF architectures: the classifier consists of layers of DFs partially or fully connected via their output posterior maps. 
+%Each layer solves a separate subtask, improves upon the current prediction or both. %DNs form a powerful and flexible meta-framework for high precision vision tasks such as medical image segmentation. 
+This architecture naturally interleaves high-level \textit{semantic} reasoning with \textit{intensity}-based low-level 
+reasoning. We demonstrate this via two ideas: a) \textit{auto-context}: allowing downstream layers to reason about 
+semantics captured in upstream layers, and b) \textit{decision pathway clustering}: latent data-space semantics are 
+revealed by clustering \textit{decision pathways} and cluster-specific DFs are trained. 
 
 \subsection{Building and training Auto-Context Forests}
 
 The process of cascading DFs is illustrated in Fig.~\ref{fig: DN concept}. Since DFs rely on generic context-sensitive features %to make statements about likely label assignments, 
-that disregard the exact nature of input channels (cf. section \ref{sec: features}), we simply proceed by augmenting the set of input channels for subsequent layers with output posterior maps from previous layers. %If $\brmx^{(1)} = \{x,I\}$ is the original data representation, fed to the first DF layer\\
+that disregard the exact nature of input channels (cf. Section~\ref{sec: features}), we simply proceed by augmenting the set of input channels for subsequent layers with output posterior maps from previous layers. %If $\brmx^{(1)} = \{x,I\}$ is the original data representation, fed to the first DF layer\\
 
 \begin{figure}
 \centering
@@ -18,9 +22,17 @@ that disregard the exact nature of input channels (cf. section \ref{sec: feature
 \caption{Auto-Context Segmentation Forests. In this schematic example, layer $2$ solves a segmentation task distinct from that of layers $1$, $3$ but the interleaving allows to exploit joint dependencies.}
 \end{figure}
 
-Layers are trained sequentially, one at a time in a greedy manner (following section \ref{sec: background}, \ref{sec: CVE}). The main appeal of the proposed approach is that it is practical, modular, fast and reliable. %We emphasize the following points: a) the ease of adjusting the layer design, of training and tuning individual layers; b) the opportunity to mix DF layers with other forms of processing; and c) the benefit of dividing a challenging hierarchical task into simpler subtasks addressed independently albeit communicating with each other. 
-Specifically, we renark that the BRATS challenge labels define a \textit{nested} structure: the whole tumour (WT) is formed of the edema (ED) and tumour core (TC). The tumour core itself is subdivided into enhancing tumour parts (ET) and other parts of the core that are only indirectly relevant to the task: the necrotic core (NC) and non-enhancing remaining parts (NE). Classically these labels would be restructured into mutually exclusive classes (ED, ET, NC, NE and the background BG) so as to recast the task as one of multiway classification. Instead the proposed framework allows to directly use these hierarchical dependencies. %by interweaving binary DFs. %: end-to-end DN training with joint optimization of layers is feasible, \eg \cite{kontschieder2015deep} but comes at the cost of fixed tree topology and MLE limitations. Comes in the way of fast experimentation, lightweight training and tuning, which we emphasize here.\\
-While many variants can reasonably be built, the final architecture that we used for the BRATS challenge consists of layers of binary DFs, alternating between prediction of WT, TC and ET.
+Layers are trained sequentially, one at a time in a greedy manner (following Sections~\ref{sec: background} and 
+\ref{sec: CVE}). 
+%The main appeal of the proposed approach is that it is practical, modular, fast and reliable. %We emphasize the following points: a) the ease of adjusting the layer design, of training and tuning individual layers; b) the opportunity to mix DF layers with other forms of processing; and c) the benefit of dividing a challenging hierarchical task into simpler subtasks addressed independently albeit communicating with each other. 
+Specifically, for the BRATS challenge, class labels follow a \textit{nested} structure: the whole tumour (WT) 
+consists of the edema (ED) and tumour core (TC). The tumour core itself is subdivided into enhancing 
+tumour parts (ET), and other parts of the core that are only indirectly relevant to the task: 
+the necrotic core (NC) and non-enhancing remaining parts (NE). Usually, 
+these labels would be interpreted as mutually exclusive classes (ED, ET, NC, NE and the background BG) 
+so as to formulate the task as a multilabel classification problem. 
+Instead, our proposed framework directly uses these hierarchical relations. %by interweaving binary DFs. %: end-to-end DN training with joint optimization of layers is feasible, \eg \cite{kontschieder2015deep} but comes at the cost of fixed tree topology and MLE limitations. Comes in the way of fast experimentation, lightweight training and tuning, which we emphasize here.\\
+While many variants can reasonably be built, the final architecture that we used for the BRATS challenge consists of layers of binary DFs, alternating between predictions of WT, TC and ET.
 
 %\noindent
 %\textbf{Boosting relevant regions.}
