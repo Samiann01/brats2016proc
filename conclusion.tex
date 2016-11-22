@@ -3,10 +3,15 @@
 \section{Conclusion}
 \label{sec:conc}
 
-We described a principled way to train DFs using hold-out estimates of the predictive error, \textit{lifting} the accuracy and generalization of individual nodes and of the DF altogether. The proposed node-splitting cost function induces a natural trade-off between prediction accuracy and model complexity: following an \textit{Occam razor}-like principle branches only grow as long as a clear gain in generalization can be evidenced. %To take full advantage of this we proposed generic, expressive, compactly parametrized features. 
-We find that shallow lifted trees formed of a few dozens or hundreds of nodes outperform conventional deep trees formed of millions of nodes. This is of practical interest: it makes training, tuning and experimenting with randomized decision forests much more straightforward. 
+We described a principled method to train DFs using hold-out estimates of the predictive error, \textit{lifting} the accuracy and generalization of individual nodes and of the DF altogether. 
+%The proposed node-splitting cost function induces a natural trade-off between prediction accuracy and model complexity: following an \textit{Occam razor}-like principle branches only grow as long as a clear gain in generalization can be evidenced. %To take full advantage of this we proposed generic, expressive, compactly parametrized features. 
+We find that shallow lifted trees formed of a few dozens or hundreds of nodes outperform conventional deep trees formed of millions of nodes. This is of practical interest: it makes training, tuning and experimenting with randomized 
+DFs much more straightforward.
 
-We exploit this benefit to experiment within the framework of auto-context forests, on challenging multi-class and multi-organ medical image segmentation tasks. Auto-context forests directly encode contextual cues about semantics, rather than merely raw intensities. We investigate several mechanisms to boost the accuracy of the sequence of DFs: ROI refinement, natural for image segmentation tasks; as well as a novel form of guided bagging. Data points are clustered via an inexpensive $k$-means scheme, based on the collection of decision paths they follow, and subsequent layers train multiple cluster-specific DFs.%This metric naturally summarizes sets of meaningful predicate sequences optimized to discriminate between classes of interest.
+We exploit this benefit to experiment within the framework of auto-context forests, on challenging multi-class and multi-organ medical image segmentation tasks. We report our experience using this approach in the MICCAI 2016 BRATS 
+challenge, where it was a top performer.
+
+%Auto-context forests directly encode contextual cues about semantics, rather than merely raw intensities. We investigate several mechanisms to boost the accuracy of the sequence of DFs: ROI refinement, natural for image segmentation tasks; as well as a novel form of guided bagging. Data points are clustered via an inexpensive $k$-means scheme, based on the collection of decision paths they follow, and subsequent layers train multiple cluster-specific DFs.%This metric naturally summarizes sets of meaningful predicate sequences optimized to discriminate between classes of interest.
 
 %We have presented preliminary results for a novel framework using cascades of lifted DFs that results in good generalization with low computational resources.
 %Next steps include a more comprehensive evaluation over the BRATS2015 dataset---in addition to reporting more
