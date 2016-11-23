@@ -30,7 +30,7 @@ These cases and similar observations motivate the two following choices: 1) An u
 
 \noindent
 \textbf{Initialization: SMM/MRF.} An SMM-MRF layer is used to locate the region of interest (ROI) for the whole tumor. The likelihood for each of the five mutually exclusive ground truth classes is modelled using a Student Mixture (SMM) with spatially varying (BG) or fixed (other classes) proportions~\cite{archambeau2007robust}, as a suitably modified variant of~\cite{cordier2015patch}. An MRF prior is assumed over BG, ED and TC. The model is similar in spirit to~\cite{zhang2001segmentation,menze2010generative}. The model is purely unsupervised: we do not use white/grey matter and cerebro-spinal fluid labels in the current implementation, but the resulting components for the background SMM are highly correlated to those labels. %We assume another MRF prior over voxel assignments to the background SMM components, encoding the rough intuition that WM/GM/CSF should smoothly vary spatially. 
-Variational Bayesian inference is used at training and test time. Both MRFs define fully connected cliques over the image, with Gaussian decay of pairwise potentials w.r.t. the distance of voxel centers. For this choice of potentials, the dependencies induced by MRF priors in variational updates can be efficiently computed via Gaussian filtering. Inference over $3D$ volumes is fast both at training (seconds or minutes) and test time (seconds).\\
+Variational Bayesian inference is used at training and test time. The MRF defines fully connected cliques over the image, with Gaussian decay of pairwise potentials w.r.t. the distance of voxel centers. For this choice of potentials, the dependencies induced by MRF priors in variational updates can be efficiently computed via Gaussian filtering. Inference over $3D$ volumes is fast both at training (seconds or minutes) and test time (seconds).\\
 
 \noindent
 \textbf{Auto-context architecture.} $9$ layers of binary DFs are cascaded, cycling between WT, TC and ET probabilities. All layers use the original, raw image channels. The input of first layers is augmented with probability maps from the upstream SMM/MRF, the subsequent layers use probability maps output by previous layers. In addition, the prior probability ``atlas" maps returned by the spatially-varying background SMM/MRF model are passed to the first layers. Many variants of this architecture were informally tested without a significant effect on accuracy.\\
@@ -39,18 +39,17 @@ Variational Bayesian inference is used at training and test time. Both MRFs defi
 \textbf{ROI refinement.} For computational convenience, subsequent layers are run on ROIs rather than the full image. For instance, the second BG vs. WT binary forest only tests points within the mask provided by the first BG vs. WT forest. Similarly at training time, the second layer is trained on subsets of image voxels within the respective image ROIs output by the first layer. Each layer uses masks obtained as dilated versions of the segmentation masks output by the previous layer (dilated resp. by $15$mm, $10$mm, $5$mm).\\
 
 \noindent
-\textbf{Parameter settings.} DFs come with a number of parameters, many of which do not seem to strongly affect the pipeline accuracy after informal experiments. Five feature types are used: intensity in a given channel (respectively, at scale $s$), difference of intensities between the voxel of interest (VOI) at scale $s_1$ and an offset voxel at scale $s_2\!>\! s_1$ in a given channel, median of the intensity difference (respectively, absolute difference) between the VOI at scale $s_1$ and the radius-$r$ icosahedron vertices (scale $s_2\! >\!s_1$) in a given channel. Between $100$ and $200$ candidate features are sampled per node. We use $2$ scales: $1$mm and $2$mm for the first layers, $0.5$mm and $1$mm for the second and final layers. The offset along each direction (or the icosahedron radius) is sampled uniformly between $0$mm and $50$mm. The range of feature responses is quantized using $50$ thresholds. The maximum tree depth is set at $12$, and is seldom reached. The number of decision pathways clusters (section \ref{sec: clustering}) is set to $4$. They are created using the first layer of WT, TC, ET (separately for each classification task). The subsampling rate for data bagging is adjusted based on the desired computation time. At each node, the training voxels from $25$ random images serve as tuning set and similarly $30$ (distinct) random images are used for validation (the remaining images are not used to train the node).
+\textbf{Parameter settings.} DFs come with a number of parameters, many of which do not seem to strongly affect the pipeline accuracy after informal experiments. Five feature types are used: intensity in a given channel (respectively, at scale $s$), difference of intensities between the voxel of interest (VOI) at scale $s_1$ and an offset voxel at scale $s_2\!>\! s_1$ in a given channel, median of the intensity difference (respectively, absolute difference) between the VOI at scale $s_1$ and the radius-$r$ icosahedron vertices (scale $s_2\! >\!s_1$) in a given channel. Between $100$ and $200$ candidate features are sampled per node. We use $2$ scales: $1$mm and $2$mm for the first layers, $0.5$mm and $1$mm for the second and final layers. The offset along each direction (or the icosahedron radius) is sampled uniformly between $0$mm and $50$mm. The range of feature responses is quantized using $50$ thresholds. The maximum tree depth is set at $12$, and is seldom reached. The number of decision pathways clusters (section \ref{sec: clustering}) is set to $4$. They are created using the first layer of WT, TC, ET (separately for each classification task). $50$ trees are trained per layer per cluster-specific DF. The subsampling rate for data bagging is adjusted based on the desired computation time. At each node, the training voxels from $25$ random images serve as tuning set and similarly $30$ (distinct) random images are used for validation (the remaining images are not used to train the node).
 
 \subsection{Test dataset (BRATS 2016)}
 
-The pipeline described above is fully automated. To our knowledge, the BRATS 2015 training dataset pre-processing includes rigid registration (as well as resampling to a common image geometry), bias field correction and skull stripping~\cite{menze2015multimodal}. The BRATS 2016 test dataset contains a number of unprocessed or partially pre-processed images (cf.~Fig.~\ref{fig: test data}). To cope with that, the pipeline was modified to include rigid registration and resampling, bias field correction~\cite{tustison2009n4itk} and skull stripping as part of a semi-automatic pre-processing step.
-
-\begin{figure}
+\begin{figure}[b]
 \centering
 \includegraphics[width=1\textwidth]{images/BRATS2016_example-data.png}
 \label{fig: test data}
 \caption{BRATS 2016 test data: example of variability not seen in the training set. (Left) Bias field (Middle) Partial skull stripping (Right) Rigid misalignment, different geometry.}
 \end{figure}
+The pipeline described above is fully automated. To our knowledge, the BRATS 2015 training dataset pre-processing includes rigid registration (as well as resampling to a common image geometry), bias field correction and skull stripping~\cite{menze2015multimodal}. The BRATS 2016 test dataset contains a number of unprocessed or partially pre-processed images (cf.~Fig.~\ref{fig: test data}). To cope with that, the pipeline was modified to include rigid registration and resampling, bias field correction~\cite{tustison2009n4itk} and skull stripping as part of a semi-automatic pre-processing step.
 
 \section{Results}
 \label{sec: results}
@@ -59,4 +58,18 @@ The proposed approach is implemented in a .NET based DF framework which we call 
 system with 16GB RAM running Microsoft Windows 10. Training on the BRATS 2015 dataset takes 
 around $6$ to $7$ hours (including "testing" on the whole dataset). Testing takes about $20$ seconds per image.
 
-The model is trained as described previously on $70$ images from the BRATS 2015 training set (about $1/4$th). Table \ref{} reports accuracy over the remaining of the BRATS 2015 dataset. These numbers are comparable to those reported in the recent state-of-the-art \eg~\cite{kamnitsas2016efficient}. It is interesting to compare these numbers against the performance on the BRATS 2016 test set. Exact DICE scores are not available but, they are roughly as follows: about $80\%$ for WT, $60\%$ for TC and over $70\%$ for ET. This shows a satisfactory generalization to unseen data given the difficulty of the task. Proper delineation of the tumour core seems to remain the most challenging task, perhaps due to the high variability of appearance across images and glioma types.
+The model is trained as described previously on $70$ images from the BRATS 2015 training set (about $1/4$th). Table \ref{tab:results} reports accuracy over the remaining of the BRATS 2015 dataset.
+\begin{table}
+\centering
+\begin{tabular}{C{3cm} | *{3}{C{2cm}}}
+Dice  & WT & TC & ET \\
+\hline
+Avg $\pm$ Std.  & 84\% $\pm$15\% & 72\% $\pm$26\% & 71\% $\pm$29\%  \\
+Median (IQR)  & 90\% (13\%) & 82\% (28\%) & 82\% (30\%)  \\
+\end{tabular} 
+\vspace{0.1in}
+\caption{Results over the remaining of the BRATS 2015 dataset for the BRATS model entered in the challenge, trained on $70$ images.}
+\label{tab:results}
+\end{table}
+
+These numbers are comparable to those reported in the recent state-of-the-art \eg~\cite{kamnitsas2016efficient}. It is informative to compare the predicted accuracy (on validation data) against the performance on the BRATS 2016 test set. DICE scores are roughly as follows (exact numbers are not available): about $80\%$ for WT, $60\%$ for TC and over $70\%$ for ET. This hints toward a satisfactory generalization to unseen data. Proper delineation of the tumour core seems to remain the most challenging task, perhaps due to the high variability of appearance across images and glioma types.
